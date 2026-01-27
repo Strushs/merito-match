@@ -1,0 +1,154 @@
+"use client";
+
+import { useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Loader2, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
+
+function LoginForm() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const initialView =
+    searchParams.get("view") === "signup" ? "signup" : "login";
+
+  const [view, setView] = useState<"login" | "signup">(initialView);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const supabase = createClient();
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (!email.endsWith("@student.gdansk.merito.pl")) {
+      toast.error(
+        "Access restricted to @student.gdansk.merito.pl emails only.",
+      );
+      setLoading(false);
+      return;
+    }
+
+    if (view === "signup") {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Check your email to confirm your account!");
+        setView("login");
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        router.refresh();
+        router.push("/browse");
+      }
+    }
+    setLoading(false);
+  };
+
+  return (
+    <Card className="w-full max-w-md border-none shadow-2xl bg-white/80 dark:bg-black/50 backdrop-blur-sm">
+      <CardHeader className="text-center space-y-2">
+        <CardTitle className="text-3xl text-primary font-bold tracking-tight">
+          {view === "login" ? "Welcome Back" : "Join Finderito"}
+        </CardTitle>
+        <CardDescription className="text-base">
+          {view === "login"
+            ? "Enter your credentials to access your account"
+            : "Create an account to start matching"}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleAuth} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Student Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="index@student.gdansk.merito.pl"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="h-12 bg-background/50"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              className="h-12 bg-background/50"
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full h-12 font-bold text-lg shadow-md hover:shadow-lg transition-all"
+            disabled={loading}
+          >
+            {loading ? (
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            ) : view === "login" ? (
+              "Log In"
+            ) : (
+              "Create Account"
+            )}
+          </Button>
+        </form>
+      </CardContent>
+      <CardFooter className="flex justify-center pb-8">
+        <Button
+          variant="link"
+          onClick={() => setView(view === "login" ? "signup" : "login")}
+          className="text-muted-foreground hover:text-primary transition-colors"
+        >
+          {view === "login"
+            ? "Don't have an account? Sign Up"
+            : "Already have an account? Log In"}
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <div className="min-h-screen bg-linear-to-br from-primary/20 via-background to-secondary/20 flex items-center justify-center p-4 relative overflow-hidden">
+      <Suspense
+        fallback={<Loader2 className="h-8 w-8 animate-spin text-primary" />}
+      >
+        <LoginForm />
+      </Suspense>
+    </div>
+  );
+}
