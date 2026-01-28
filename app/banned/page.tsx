@@ -39,19 +39,6 @@ export default async function BannedPage() {
         </p>
       </div>
 
-      <div className="text-sm p-4 border rounded-md bg-background max-w-sm">
-        <p className="font-semibold mb-1">Think this is a mistake?</p>
-        <p className="text-muted-foreground">
-          Contact our support team at <br />
-          <a
-            href="mailto:support@merito-match.pl"
-            className="text-primary hover:underline"
-          >
-            support@merito-match.pl
-          </a>
-        </p>
-      </div>
-
       <form
         action={async () => {
           "use server";
