@@ -27,7 +27,7 @@ A modern dating/matching application exclusively for WSB Merito Gdańsk students
 | **Styling**    | Tailwind CSS 4, shadcn/ui             |
 | **Backend**    | Supabase (PostgreSQL, Auth, Realtime) |
 | **Language**   | TypeScript                            |
-| **Deployment** | DigitalOcean / Vercel                 |
+| **Deployment** | DigitalOcean                          |
 
 ## 🚀 Quick Start
 
@@ -112,7 +112,7 @@ See [DEPLOYMENT.md](./DEPLOYMENT.md) for full DigitalOcean hosting instructions.
 
 **Quick Overview:**
 
-- **Frontend**: Vercel or DigitalOcean App Platform
+- **Frontend**: DigitalOcean App Platform
 - **Backend**: Self-hosted Supabase on 8GB Droplet
 - **Cost**: ~$60/month (covered by GitHub Student Pack)
 

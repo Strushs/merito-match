@@ -124,51 +124,6 @@ function LoginForm() {
               "Create Account"
             )}
           </Button>
-
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white dark:bg-[#111] px-2 text-muted-foreground">
-                Or continue with
-              </span>
-            </div>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full h-12 flex items-center justify-center gap-2 border-2 hover:bg-muted/50 transition-all"
-            onClick={async () => {
-              setLoading(true);
-              const { error } = await supabase.auth.signInWithOAuth({
-                provider: "azure",
-                options: {
-                  scopes: "email  openid",
-                  redirectTo: `${window.location.origin}/auth/callback`,
-                },
-              });
-              if (error) {
-                toast.error(error.message);
-                setLoading(false);
-              }
-            }}
-            disabled={loading}
-          >
-            <svg
-              className="w-5 h-5"
-              viewBox="0 0 23 23"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path fill="#f3f3f3" d="M0 0h23v23H0z" />
-              <path fill="#f35325" d="M1 1h10v10H1z" />
-              <path fill="#81bc06" d="M12 1h10v10H12z" />
-              <path fill="#05a6f0" d="M1 12h10v10H1z" />
-              <path fill="#ffba08" d="M12 12h10v10H12z" />
-            </svg>
-            Sign in with Microsoft
-          </Button>
         </form>
       </CardContent>
       <CardFooter className="flex justify-center pb-8 pt-0">
