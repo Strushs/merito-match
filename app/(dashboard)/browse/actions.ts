@@ -12,7 +12,7 @@ export async function likeUser(targetUserId: string) {
   if (!user) throw new Error("Not authenticated");
 
   // Check if target already liked us
-  const { data: likedBack, error: likedBackError } = await supabase
+  const { data: likedBack } = await supabase
     .from("likes")
     .select("*")
     .eq("from_user", targetUserId)
@@ -78,7 +78,7 @@ export async function likeUser(targetUserId: string) {
     return { isMatch: true, matchId: match.id };
   } else {
     // Just a like
-    const { data: insertedLike, error } = await supabase
+    const { error } = await supabase
       .from("likes")
       .insert({
         from_user: user.id,

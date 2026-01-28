@@ -85,7 +85,9 @@ export default async function ChatListPage() {
 
   // Helper to get the OTHER user
   // Defined here to be used in filter
-  const getOtherProfileGeneric = (match: any): ProfileData | null => {
+  type MatchData = NonNullable<typeof matchesData>[number];
+
+  const getOtherProfileGeneric = (match: MatchData): ProfileData | null => {
     const p =
       match.user_a === user.id ? match.participant_b : match.participant_a;
     if (!p || Array.isArray(p)) return null;

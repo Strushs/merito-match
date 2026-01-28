@@ -568,17 +568,17 @@ export default function ChatWindow({
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 bg-background border-t pb-[max(1rem,env(safe-area-inset-bottom))]">
-        <form onSubmit={handleSendMessage} className="flex gap-2">
+      <div className="pt-4 bg-background border-t pb-1 px-8">
+        <form onSubmit={handleSendMessage} className="flex gap-3">
           <Input
             value={newMessage}
             onChange={handleInputChange}
             placeholder="Type a message..."
-            className="flex-1 rounded-full"
+            className="flex-1 rounded-lg h-12"
             maxLength={500}
           />
-          <Button type="submit" size="icon" className="rounded-full">
-            <Send className="h-4 w-4" />
+          <Button type="submit" size="icon" className="rounded-lg h-12 w-12">
+            <Send className="h-5 w-5" />
           </Button>
         </form>
       </div>

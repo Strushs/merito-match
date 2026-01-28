@@ -11,14 +11,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import {
-  ShieldAlert,
-  Trash2,
-  Eye,
-  Ban,
-  CheckCircle,
-  Filter,
-} from "lucide-react";
+import { Eye, Ban, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 type FilterStatus = "all" | "pending" | "resolved";
@@ -56,9 +49,10 @@ export default function ReportList({
     try {
       await resolveReport(id);
       toast.success("Report marked as resolved");
-    } catch (e) {
+    } catch (_e) {
       setReports(original); // Revert
       toast.error("Failed to resolve report");
+      console.log(_e);
     }
   };
 
@@ -72,11 +66,14 @@ export default function ReportList({
     try {
       await dismissReport(id);
       toast.success("Report deleted");
-    } catch (e) {
+    } catch (_e) {
       setReports(original); // Revert
       toast.error("Failed to delete report");
+      console.log(_e);
     }
   };
+  // Keep handleDismiss for potential future use
+  void handleDismiss;
 
   const handleBan = async (report: ReportData) => {
     if (!confirm(`Permanently BAN user ${report.accused.email}?`)) return;
@@ -85,8 +82,9 @@ export default function ReportList({
     try {
       await banUser(report.accused.id);
       toast.success(`User ${report.accused.email} has been BANNED.`);
-    } catch (e) {
+    } catch (_e) {
       toast.error("Failed to ban user");
+      console.log(_e);
     } finally {
       setIsProcessing(false);
     }

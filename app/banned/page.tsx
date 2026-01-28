@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Ghost, ShieldAlert } from "lucide-react";
-import Link from "next/link";
+import { ShieldAlert } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 

@@ -87,7 +87,18 @@ export async function unmatchUser(matchId: number) {
 }
 
 // Helper to getting display names (basic implementation)
-async function getChatTranscript(supabase: any, matchId: number) {
+type ChatMessage = {
+  created_at: string;
+  content: string;
+  sender: { email: string }[] | null;
+};
+
+async function getChatTranscript(
+  supabase: ReturnType<typeof createClient> extends Promise<infer T>
+    ? T
+    : never,
+  matchId: number,
+) {
   const { data: messages } = await supabase
     .from("messages")
     .select(
@@ -103,8 +114,8 @@ async function getChatTranscript(supabase: any, matchId: number) {
   if (!messages || messages.length === 0) return "No messages found.";
 
   return messages
-    .map((m: any) => {
-      const email = m.sender?.email || "Unknown";
+    .map((m: ChatMessage) => {
+      const email = m.sender?.[0]?.email || "Unknown";
       return `${email} : ${m.content}`;
     })
     .join("\n");
