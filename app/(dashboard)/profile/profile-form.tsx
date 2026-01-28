@@ -18,7 +18,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
 
-export default function ProfileForm({ profile }: { profile: any }) {
+type Profile = {
+  id: string;
+  nickname: string | null;
+  bio: string | null;
+  intent: string | null;
+  semester: number | null;
+  study_field: string | null;
+};
+
+export default function ProfileForm({ profile }: { profile: Profile }) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();

@@ -1,8 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import SwipeDeck from "./swipe-deck";
-import SignOutButton from "@/components/sign-out-button";
 
 export default async function BrowsePage() {
   const supabase = await createClient();
@@ -24,16 +22,30 @@ export default async function BrowsePage() {
   }
 
   // Fetch my likes to exclude them
-  // Note: For large scale valid SQL "NOT IN" is bad, but for MVP it's fine.
   const { data: myLikes } = await supabase
     .from("likes")
     .select("to_user")
     .eq("from_user", user.id);
 
-  const excludedIds = myLikes?.map((l) => l.to_user) || [];
-  excludedIds.push(user.id); // Exclude self
+  // Fetch users I have blocked
+  const { data: iBlocked } = await supabase
+    .from("blocked_users")
+    .select("blocked_id")
+    .eq("blocker_id", user.id);
 
-  // Fetch potential candidates, filtering by intent and excluding already liked/self
+  // Fetch users who blocked me
+  const { data: blockedMe } = await supabase
+    .from("blocked_users")
+    .select("blocker_id")
+    .eq("blocked_id", user.id);
+
+  const excludedIds = new Set<string>();
+  excludedIds.add(user.id); // Exclude self
+  myLikes?.forEach((l) => excludedIds.add(l.to_user));
+  iBlocked?.forEach((b) => excludedIds.add(b.blocked_id));
+  blockedMe?.forEach((b) => excludedIds.add(b.blocker_id));
+
+  // Fetch potential candidates, filtering by intent and excluding already liked/self/blocked
   // We cannot easily do "NOT IN" array in Supabase JS simply without stored procedure for large sets,
   // but we can slice client side or use .not('id', 'in', `(${excludedIds.join(',')})`)
 
@@ -43,9 +55,11 @@ export default async function BrowsePage() {
     .select("*")
     .eq("intent", profile.intent); // MATCHING LOGIC: Same Intent
 
-  if (excludedIds.length > 0) {
+  if (excludedIds.size > 0) {
+    // Array.from to convert Set to Array
+    const excludedArray = Array.from(excludedIds);
     // Batch if too many, but for now assumption is prototype scale
-    query = query.not("id", "in", `(${excludedIds.join(",")})`);
+    query = query.not("id", "in", `(${excludedArray.join(",")})`);
   }
 
   const { data: candidates, error } = await query.limit(20);

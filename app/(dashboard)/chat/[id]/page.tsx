@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { redirect, notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import ChatWindow from "./chat-window";
 import Link from "next/link";
 
@@ -23,12 +23,43 @@ export default async function ChatPage({ params }: Props) {
 
   if (!user) return redirect("/login");
 
-  // Fetch Initial Messages
+  // Verify user is a participant in this match
+  const { data: match, error: matchError } = await supabase
+    .from("matches")
+    .select("id, user_a, user_b")
+    .eq("id", id)
+    .or(`user_a.eq.${user.id},user_b.eq.${user.id}`)
+    .single();
+
+  if (matchError || !match) {
+    // User is not a participant in this chat or match doesn't exist
+    console.log("Chat access denied:", {
+      matchId: id,
+      userId: user.id,
+      error: matchError,
+    });
+    return redirect("/chat");
+  }
+
+  const PAGE_SIZE = 50;
+
+  // Fetch total count to determine if there are older messages
+  const { count: totalCount } = await supabase
+    .from("messages")
+    .select("*", { count: "exact", head: true })
+    .eq("match_id", id);
+
+  // Fetch the last PAGE_SIZE messages (most recent)
   const { data: messages, error } = await supabase
     .from("messages")
     .select("*")
     .eq("match_id", id)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: false })
+    .limit(PAGE_SIZE);
+
+  // Reverse to show oldest first in the UI
+  const orderedMessages = messages?.reverse() || [];
+  const hasMoreMessages = (totalCount || 0) > PAGE_SIZE;
 
   if (error) {
     console.error("Chat Load Error:", error);
@@ -44,18 +75,13 @@ export default async function ChatPage({ params }: Props) {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 bottom-0 z-50 bg-background flex flex-col md:static md:z-auto md:h-[calc(100vh-64px)] overflow-hidden border-b-0">
-      <header className="h-16 border-b flex items-center px-4 bg-background/80 backdrop-blur z-50 shrink-0">
-        <a href="/chat" className="text-sm font-medium hover:underline mr-4">
-          ← Matches
-        </a>
-        <span className="font-semibold">Chat</span>
-      </header>
+    <div className="fixed top-0 left-0 right-0 bottom-0 z-50 bg-background flex flex-col md:static md:z-auto md:h-screen pt-[16.5px] pb-[24px] overflow-hidden border-b-0">
       <div className="flex-1 overflow-hidden">
         <ChatWindow
           matchId={id}
-          initialMessages={messages || []}
+          initialMessages={orderedMessages}
           currentUserId={user.id}
+          hasMoreMessages={hasMoreMessages}
         />
       </div>
     </div>

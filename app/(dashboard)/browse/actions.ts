@@ -12,7 +12,7 @@ export async function likeUser(targetUserId: string) {
   if (!user) throw new Error("Not authenticated");
 
   // Check if target already liked us
-  const { data: likedBack } = await supabase
+  const { data: likedBack, error: likedBackError } = await supabase
     .from("likes")
     .select("*")
     .eq("from_user", targetUserId)
@@ -21,6 +21,22 @@ export async function likeUser(targetUserId: string) {
 
   if (likedBack) {
     // IT'S A MATCH!
+
+    // Check if match already exists (the other user might have created it first)
+    const { data: existingMatch } = await supabase
+      .from("matches")
+      .select("id")
+      .or(
+        `and(user_a.eq.${user.id},user_b.eq.${targetUserId}),and(user_a.eq.${targetUserId},user_b.eq.${user.id})`,
+      )
+      .single();
+
+    if (existingMatch) {
+      // Match already exists, return it
+      revalidatePath("/chat");
+      return { isMatch: true, matchId: existingMatch.id };
+    }
+
     // Create match record
     const { data: match, error } = await supabase
       .from("matches")
@@ -32,7 +48,21 @@ export async function likeUser(targetUserId: string) {
       .single();
 
     if (error) {
-      console.error("Error creating match:", error);
+      // If unique constraint violation, try to fetch existing match
+      if (error.code === "23505") {
+        const { data: foundMatch } = await supabase
+          .from("matches")
+          .select("id")
+          .or(
+            `and(user_a.eq.${user.id},user_b.eq.${targetUserId}),and(user_a.eq.${targetUserId},user_b.eq.${user.id})`,
+          )
+          .single();
+
+        if (foundMatch) {
+          revalidatePath("/chat");
+          return { isMatch: true, matchId: foundMatch.id };
+        }
+      }
       throw error;
     }
 
@@ -43,23 +73,23 @@ export async function likeUser(targetUserId: string) {
       status: "accepted",
     });
 
-    // Update the other user's like status to accepted (optional)
-
-    revalidatePath("/browse");
+    // Only revalidate /chat, NOT /browse - otherwise it resets client state
     revalidatePath("/chat");
     return { isMatch: true, matchId: match.id };
   } else {
     // Just a like
-    const { error } = await supabase.from("likes").insert({
-      from_user: user.id,
-      to_user: targetUserId,
-      status: "pending",
-    });
+    const { data: insertedLike, error } = await supabase
+      .from("likes")
+      .insert({
+        from_user: user.id,
+        to_user: targetUserId,
+        status: "pending",
+      })
+      .select();
 
     if (error) {
       // If unique constraint violation, means we already liked them. Ignore.
       if (error.code !== "23505") {
-        console.error("Error creating like:", error);
         throw error;
       }
     }

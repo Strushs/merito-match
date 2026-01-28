@@ -3,8 +3,14 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
-import SignOutButton from "@/components/sign-out-button";
 import { cn } from "@/lib/utils";
+
+type ProfileData = {
+  id: string;
+  study_field: string | null;
+  avatar_url: string | null;
+  nickname: string | null;
+};
 
 export const dynamic = "force-dynamic"; // Prevent caching of unread status
 
@@ -25,10 +31,26 @@ export default async function ChatListPage() {
 
   if (!profile) return redirect("/onboarding");
 
+  // 1. Fetch blocks I've made
+  const { data: iBlocked } = await supabase
+    .from("blocked_users")
+    .select("blocked_id")
+    .eq("blocker_id", user.id);
+
+  // 2. Fetch blocks against me (Users who blocked me)
+  const { data: blockedMe } = await supabase
+    .from("blocked_users")
+    .select("blocker_id")
+    .eq("blocked_id", user.id);
+
+  const blockedUserIds = new Set<string>();
+  iBlocked?.forEach((b) => blockedUserIds.add(b.blocked_id));
+  blockedMe?.forEach((b) => blockedUserIds.add(b.blocker_id));
+
   // Fetch matches involving me
   // Using !user_a and !user_b to specify the foreign key column explicitly
   // Also fetching latest message to check for unread
-  const { data: matches, error } = await supabase
+  const { data: matchesData, error } = await supabase
     .from("matches")
     .select(
       `
@@ -60,10 +82,20 @@ export default async function ChatListPage() {
     );
   }
 
+  // Filter out matches with blocked users
+  const matches = matchesData?.filter((match) => {
+    const otherUserId = match.user_a === user.id ? match.user_b : match.user_a;
+    return !blockedUserIds.has(otherUserId);
+  });
+
+  type Match = NonNullable<typeof matches>[number];
+
   // Helper to get the OTHER user
-  const getOtherProfile = (match: any) => {
-    if (match.user_a === user.id) return match.participant_b;
-    return match.participant_a;
+  const getOtherProfile = (match: Match): ProfileData | null => {
+    const profile =
+      match.user_a === user.id ? match.participant_b : match.participant_a;
+    if (!profile || Array.isArray(profile)) return null;
+    return profile as ProfileData;
   };
 
   return (
@@ -71,7 +103,7 @@ export default async function ChatListPage() {
       <div className="mb-6 pt-10 md:pt-0">
         <h1 className="text-3xl font-bold tracking-tight">Your Matches</h1>
         <p className="text-muted-foreground">
-          Chat with students you've matched with.
+          Chat with students you&apos;ve matched with.
         </p>
       </div>
 
@@ -83,7 +115,7 @@ export default async function ChatListPage() {
         )}
         {matches?.map((match) => {
           const other = getOtherProfile(match);
-          if (!other || Array.isArray(other)) return null;
+          if (!other) return null;
 
           // Unread Logic
           const myLastRead =
@@ -123,7 +155,7 @@ export default async function ChatListPage() {
                 )}
               >
                 <Avatar className="h-12 w-12">
-                  <AvatarImage src={other.avatar_url} />
+                  <AvatarImage src={other.avatar_url ?? undefined} />
                   <AvatarFallback>{other.study_field?.[0]}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
