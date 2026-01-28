@@ -1,36 +1,131 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 💕 Finderito (MeritoMatch)
 
-## Getting Started
+A modern dating/matching application exclusively for WSB Merito Gdańsk students. Built with Next.js 15, Supabase, and TypeScript.
 
-First, run the development server:
+![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)
+![Supabase](https://img.shields.io/badge/Supabase-Backend-green?logo=supabase)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.0-38bdf8?logo=tailwindcss)
+
+## ✨ Features
+
+- **🔐 University-Only Access** - Restricted to `@student.gdansk.merito.pl` emails
+- **💘 Swipe Matching** - Tinder-style card swiping with animations
+- **💬 Real-time Chat** - Instant messaging with typing indicators
+- **🔔 Unread Badges** - Visual indicators for new messages
+- **🚫 Block & Report** - User safety with blocking and reporting system
+- **👮 Admin Panel** - Moderate reports, ban users, view chat transcripts
+- **📱 Mobile First** - Fully responsive design with bottom navigation
+- **🌙 Dark Mode** - Beautiful dark theme with pink accents
+- **🔑 Microsoft SSO** - Optional Azure AD authentication
+
+## 🛠️ Tech Stack
+
+| Layer          | Technology                            |
+| -------------- | ------------------------------------- |
+| **Frontend**   | Next.js 15 (App Router)               |
+| **Styling**    | Tailwind CSS 4, shadcn/ui             |
+| **Backend**    | Supabase (PostgreSQL, Auth, Realtime) |
+| **Language**   | TypeScript                            |
+| **Deployment** | DigitalOcean / Vercel                 |
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- npm or pnpm
+- Supabase account
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/merito-match.git
+cd merito-match
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+```
+
+### Environment Variables
+
+Create `.env.local` with:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+```
+
+### Database Setup
+
+Run the SQL scripts in Supabase SQL Editor:
+
+1. `supabase_setup.sql` - Core tables (profiles, likes, matches, messages)
+2. `update_schema_nickname.sql` - Add nickname field
+3. `update_schema_unread.sql` - Add unread tracking
+
+### Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📁 Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+merito-match/
+├── app/
+│   ├── (dashboard)/       # Protected routes
+│   │   ├── browse/        # Swipe deck
+│   │   ├── chat/          # Chat list & rooms
+│   │   └── profile/       # User profile
+│   ├── admin/             # Admin panel
+│   ├── auth/              # Auth callback
+│   ├── banned/            # Banned user page
+│   ├── login/             # Login/signup
+│   └── onboarding/        # New user setup
+├── components/
+│   ├── ui/                # shadcn components
+│   └── dashboard-nav.tsx  # Navigation
+├── lib/
+│   └── supabase/          # Supabase clients
+└── DEPLOYMENT.md          # Hosting guide
+```
 
-## Learn More
+## 🔐 Admin Panel
 
-To learn more about Next.js, take a look at the following resources:
+To access the admin panel:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Set `is_admin = true` for your user in the `profiles` table
+2. Navigate to `/admin`
+3. Manage reports, ban users, view evidence
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🌐 Deployment
 
-## Deploy on Vercel
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for full DigitalOcean hosting instructions.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Quick Overview:**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Frontend**: Vercel or DigitalOcean App Platform
+- **Backend**: Self-hosted Supabase on 8GB Droplet
+- **Cost**: ~$60/month (covered by GitHub Student Pack)
+
+## 📝 License
+
+This project is for educational purposes at WSB Merito University.
+
+## 👨‍💻 Author
+
+Created by Dawid - WSB Merito Gdańsk Student
+
+---
+
+<p align="center">
+  Made with ❤️ for Merito students
+</p>
