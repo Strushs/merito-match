@@ -62,6 +62,9 @@ export default async function BrowsePage() {
     query = query.not("id", "in", `(${excludedArray.join(",")})`);
   }
 
+  // Filter out banned users
+  query = query.eq("is_banned", false);
+
   const { data: candidates, error } = await query.limit(20);
 
   if (error) {

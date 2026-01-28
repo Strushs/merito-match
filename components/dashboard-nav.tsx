@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MessageSquare, User, Heart } from "lucide-react";
+import { MessageSquare, User, Heart, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SignOutButton from "@/components/sign-out-button";
 
-export default function DashboardNav() {
+export default function DashboardNav({ isAdmin }: { isAdmin?: boolean }) {
   const pathname = usePathname();
 
   const links = [
@@ -14,6 +14,10 @@ export default function DashboardNav() {
     { href: "/chat", label: "Matches", icon: MessageSquare },
     { href: "/profile", label: "Profile", icon: User },
   ];
+
+  if (isAdmin) {
+    links.push({ href: "/admin", label: "Panel Admin", icon: Shield });
+  }
 
   const isChatRoom = pathname.startsWith("/chat/") && pathname !== "/chat";
 

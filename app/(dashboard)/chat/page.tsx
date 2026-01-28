@@ -10,6 +10,7 @@ type ProfileData = {
   study_field: string | null;
   avatar_url: string | null;
   nickname: string | null;
+  is_banned: boolean | null;
 };
 
 export const dynamic = "force-dynamic"; // Prevent caching of unread status
@@ -59,8 +60,8 @@ export default async function ChatListPage() {
       user_b,
       user_a_last_read,
       user_b_last_read,
-      participant_a:profiles!user_a(id, study_field, avatar_url, nickname),
-      participant_b:profiles!user_b(id, study_field, avatar_url, nickname),
+      participant_a:profiles!user_a(id, study_field, avatar_url, nickname, is_banned),
+      participant_b:profiles!user_b(id, study_field, avatar_url, nickname, is_banned),
       last_msg:messages(created_at, sender_id)
     `,
     )
@@ -82,20 +83,34 @@ export default async function ChatListPage() {
     );
   }
 
-  // Filter out matches with blocked users
+  // Helper to get the OTHER user
+  // Defined here to be used in filter
+  const getOtherProfileGeneric = (match: any): ProfileData | null => {
+    const p =
+      match.user_a === user.id ? match.participant_b : match.participant_a;
+    if (!p || Array.isArray(p)) return null;
+    return p as ProfileData;
+  };
+
+  // Filter out matches with blocked OR BANNED users
   const matches = matchesData?.filter((match) => {
     const otherUserId = match.user_a === user.id ? match.user_b : match.user_a;
-    return !blockedUserIds.has(otherUserId);
+
+    // Check Blocks
+    if (blockedUserIds.has(otherUserId)) return false;
+
+    // Check Bans
+    const otherProfile = getOtherProfileGeneric(match);
+    if (otherProfile?.is_banned) return false;
+
+    return true;
   });
 
   type Match = NonNullable<typeof matches>[number];
 
-  // Helper to get the OTHER user
+  // Re-define for typed usage below
   const getOtherProfile = (match: Match): ProfileData | null => {
-    const profile =
-      match.user_a === user.id ? match.participant_b : match.participant_a;
-    if (!profile || Array.isArray(profile)) return null;
-    return profile as ProfileData;
+    return getOtherProfileGeneric(match);
   };
 
   return (

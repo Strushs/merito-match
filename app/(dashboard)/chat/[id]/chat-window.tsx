@@ -445,7 +445,7 @@ export default function ChatWindow({
               onClick={handleUnmatch}
             >
               <Ban className="mr-2 h-4 w-4" />
-              Unmatch
+              <span className="text-white">Unmatch</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

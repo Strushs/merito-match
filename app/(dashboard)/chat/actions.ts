@@ -90,17 +90,23 @@ export async function unmatchUser(matchId: number) {
 async function getChatTranscript(supabase: any, matchId: number) {
   const { data: messages } = await supabase
     .from("messages")
-    .select("created_at, sender_id, content")
+    .select(
+      `
+      created_at, 
+      content,
+      sender:profiles(email)
+    `,
+    )
     .eq("match_id", matchId)
     .order("created_at", { ascending: true });
 
   if (!messages || messages.length === 0) return "No messages found.";
 
   return messages
-    .map(
-      (m: any) =>
-        `[${new Date(m.created_at).toLocaleString()}] ${m.sender_id}: ${m.content}`,
-    )
+    .map((m: any) => {
+      const email = m.sender?.email || "Unknown";
+      return `${email} : ${m.content}`;
+    })
     .join("\n");
 }
 
