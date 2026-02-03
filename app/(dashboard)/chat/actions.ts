@@ -86,13 +86,6 @@ export async function unmatchUser(matchId: number) {
   revalidatePath("/browse");
 }
 
-// Helper to getting display names (basic implementation)
-type ChatMessage = {
-  created_at: string;
-  content: string;
-  sender: { email: string }[] | null;
-};
-
 async function getChatTranscript(
   supabase: ReturnType<typeof createClient> extends Promise<infer T>
     ? T
@@ -101,22 +94,29 @@ async function getChatTranscript(
 ) {
   const { data: messages } = await supabase
     .from("messages")
-    .select(
-      `
-      created_at, 
-      content,
-      sender:profiles(email)
-    `,
-    )
+    .select("created_at, content, sender_id")
     .eq("match_id", matchId)
     .order("created_at", { ascending: true });
 
   if (!messages || messages.length === 0) return "No messages found.";
 
+  // Fetch profiles manually to ensure we get emails (avoids FK issues)
+  const senderIds = Array.from(new Set(messages.map((m) => m.sender_id)));
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id, email")
+    .in("id", senderIds);
+
+  const emailMap = new Map<string, string>();
+  profiles?.forEach((p) => {
+    if (p.email) emailMap.set(p.id, p.email);
+  });
+
   return messages
-    .map((m: ChatMessage) => {
-      const email = m.sender?.[0]?.email || "Unknown";
-      return `${email} : ${m.content}`;
+    .map((m) => {
+      const email =
+        emailMap.get(m.sender_id) || `User ${m.sender_id.slice(0, 8)}...`;
+      return `${email}:${m.content}`;
     })
     .join("\n");
 }
