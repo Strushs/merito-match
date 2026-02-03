@@ -49,44 +49,44 @@
 :root {
   --radius: 0.625rem;
 
-  /* Deep Rose Dark Theme - Final Darker Pink */
-  --background: #2d0412; /* Very Deep Burgundy */
-  --foreground: #ffe4e6; /* Rose 100 */
+  /* Finderito Theme - Dark Burgundy & Coral Pink via Screenshot */
+  --background: #1a050b; /* Very Dark Merlot/Black-Red */
+  --foreground: #ffcad4; /* Light Pink/Peach */
 
-  --card: #680d2b; /* Rose 900 */
-  --card-foreground: #ffe4e6;
+  --card: #2f0a16; /* Slightly lighter burgundy */
+  --card-foreground: #ffcad4;
 
-  --popover: #680d2b;
-  --popover-foreground: #ffe4e6;
+  --popover: #2f0a16;
+  --popover-foreground: #ffcad4;
 
-  --primary: #fb7185; /* Rose 400 */
-  --primary-foreground: #2e0410;
+  --primary: #ff5c7c; /* Bright Coral Pink (Logo/Buttons) */
+  --primary-foreground: #1a050b;
 
-  --secondary: #9f1239; /* Rose 800 */
-  --secondary-foreground: #ffe4e6;
+  --secondary: #4a0d1f; /* Deep Red/Burgundy (Button backgrounds) */
+  --secondary-foreground: #ffcad4;
 
-  --muted: #50071c; /* Rose 950 */
-  --muted-foreground: #fda4af; /* Rose 300 */
+  --muted: #4a0d1f;
+  --muted-foreground: #d08290;
 
-  --accent: #831843;
-  --accent-foreground: #ffe4e6;
+  --accent: #ff5c7c;
+  --accent-foreground: #1a050b;
 
   --destructive: #7f1d1d;
   --destructive-foreground: #ffffff;
 
-  --border: #881337;
-  --input: #50071c;
-  --ring: #fb7185;
+  --border: #4a0d1f;
+  --input: #2f0a16;
+  --ring: #ff5c7c;
 
-  /* Sidebar */
-  --sidebar: #24030e; /* Darker than BG */
-  --sidebar-foreground: #ffe4e6;
-  --sidebar-primary: #fb7185;
-  --sidebar-primary-foreground: #2e0410;
-  --sidebar-accent: #680d2b;
-  --sidebar-accent-foreground: #ffe4e6;
-  --sidebar-border: #831843;
-  --sidebar-ring: #fb7185;
+  /* Sidebar (Matches Background for seamless look or slight variation) */
+  --sidebar: #1a050b;
+  --sidebar-foreground: #ffcad4;
+  --sidebar-primary: #ff5c7c;
+  --sidebar-primary-foreground: #1a050b;
+  --sidebar-accent: #2f0a16;
+  --sidebar-accent-foreground: #ffcad4;
+  --sidebar-border: #4a0d1f;
+  --sidebar-ring: #ff5c7c;
 
   /* Charts */
   --chart-1: oklch(0.646 0.222 41.116);
@@ -97,33 +97,33 @@
 }
 
 .dark {
-  --background: #2d0412;
-  --foreground: #ffe4e6;
-  --card: #680d2b;
-  --card-foreground: #ffe4e6;
-  --popover: #680d2b;
-  --popover-foreground: #ffe4e6;
-  --primary: #fb7185;
-  --primary-foreground: #2e0410;
-  --secondary: #9f1239;
-  --secondary-foreground: #ffe4e6;
-  --muted: #50071c;
-  --muted-foreground: #fda4af;
-  --accent: #831843;
-  --accent-foreground: #ffe4e6;
+  --background: #1a050b;
+  --foreground: #ffcad4;
+  --card: #2f0a16;
+  --card-foreground: #ffcad4;
+  --popover: #2f0a16;
+  --popover-foreground: #ffcad4;
+  --primary: #ff5c7c;
+  --primary-foreground: #1a050b;
+  --secondary: #4a0d1f;
+  --secondary-foreground: #ffcad4;
+  --muted: #4a0d1f;
+  --muted-foreground: #d08290;
+  --accent: #ff5c7c;
+  --accent-foreground: #1a050b;
   --destructive: #7f1d1d;
   --destructive-foreground: #ffffff;
-  --border: #881337;
-  --input: #50071c;
-  --ring: #fb7185;
-  --sidebar: #24030e;
-  --sidebar-foreground: #ffe4e6;
-  --sidebar-primary: #fb7185;
-  --sidebar-primary-foreground: #2e0410;
-  --sidebar-accent: #680d2b;
-  --sidebar-accent-foreground: #ffe4e6;
-  --sidebar-border: #831843;
-  --sidebar-ring: #fb7185;
+  --border: #4a0d1f;
+  --input: #2f0a16;
+  --ring: #ff5c7c;
+  --sidebar: #1a050b;
+  --sidebar-foreground: #ffcad4;
+  --sidebar-primary: #ff5c7c;
+  --sidebar-primary-foreground: #1a050b;
+  --sidebar-accent: #2f0a16;
+  --sidebar-accent-foreground: #ffcad4;
+  --sidebar-border: #4a0d1f;
+  --sidebar-ring: #ff5c7c;
 }
 
 @layer base {
@@ -132,5 +132,42 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .delay-4000 {
+    animation-delay: 4s;
+  }
+
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-lg border border-white/20 shadow-xl;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-linear-to-r from-pink-500 to-rose-500;
+  }
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
   }
 }
