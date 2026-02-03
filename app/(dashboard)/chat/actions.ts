@@ -92,25 +92,32 @@ async function getChatTranscript(
     : never,
   matchId: number,
 ) {
-  const { data: messages } = await supabase
+  const { data: messages, error: messagesError } = await supabase
     .from("messages")
     .select("created_at, content, sender_id")
     .eq("match_id", matchId)
     .order("created_at", { ascending: true });
 
+  if (messagesError) {
+    console.error("Error fetching messages for transcript:", messagesError);
+    return "Error fetching messages.";
+  }
+
   if (!messages || messages.length === 0) return "No messages found.";
 
-  // Fetch profiles manually to ensure we get emails (avoids FK issues)
+  // Get unique sender IDs
   const senderIds = Array.from(new Set(messages.map((m) => m.sender_id)));
-  const { data: profiles } = await supabase
-    .from("profiles")
-    .select("id, email")
-    .in("id", senderIds);
 
+  // Fetch emails from auth.users using our database function
   const emailMap = new Map<string, string>();
-  profiles?.forEach((p) => {
-    if (p.email) emailMap.set(p.id, p.email);
-  });
+  for (const senderId of senderIds) {
+    const { data: email } = await supabase.rpc("get_user_email", {
+      user_id: senderId,
+    });
+    if (email) {
+      emailMap.set(senderId, email);
+    }
+  }
 
   return messages
     .map((m) => {
