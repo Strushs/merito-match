@@ -17,7 +17,7 @@ export default function Home() {
           Finderito
         </h1>
         <p className="text-xl text-muted-foreground">
-          Find your study buddy or soulmate at Merito University.
+          Find your study buddy or soulmate
         </p>
 
         <Card className="border-none shadow-none bg-transparent">
