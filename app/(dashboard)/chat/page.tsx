@@ -157,12 +157,6 @@ export default async function ChatListPage() {
             latestMsg.sender_id !== user.id &&
             new Date(latestMsg.created_at) > new Date(myLastRead);
 
-          if (hasUnread) {
-            console.log(
-              `Unread Match ${match.id}: MsgTime ${latestMsg.created_at} > ReadTime ${myLastRead}`,
-            );
-          }
-
           return (
             <Link key={match.id} href={`/chat/${match.id}`}>
               <Card

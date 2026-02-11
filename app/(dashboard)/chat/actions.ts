@@ -22,9 +22,6 @@ export async function markMessagesAsRead(matchId: number) {
 
   const updateField =
     match.user_a === user.id ? "user_a_last_read" : "user_b_last_read";
-  console.log(
-    `Marking read for match ${matchId} as user ${user.id} (${updateField})`,
-  );
 
   const { error } = await supabase
     .from("matches")
