@@ -31,6 +31,6 @@ export async function GET(request: Request) {
     }
   }
 
-  // return the user to an error page with instructions
-  return NextResponse.redirect(`${baseUrl}/auth/auth-code-error`);
+  // Email was confirmed but PKCE flow couldn't complete — redirect to login
+  return NextResponse.redirect(`${baseUrl}/login?confirmed=true`);
 }
