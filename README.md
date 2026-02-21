@@ -17,7 +17,6 @@ A modern dating/matching application exclusively for WSB Merito Gdańsk students
 - **👮 Admin Panel** - Moderate reports, ban users, view chat transcripts
 - **📱 Mobile First** - Fully responsive design with bottom navigation
 - **🌙 Dark Mode** - Beautiful dark theme with pink accents
-- **🔑 Microsoft SSO** - Optional Azure AD authentication
 
 ## 🛠️ Tech Stack
 
@@ -36,37 +35,6 @@ A modern dating/matching application exclusively for WSB Merito Gdańsk students
 - Node.js 18+
 - npm or pnpm
 - Supabase account
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/merito-match.git
-cd merito-match
-
-# Install dependencies
-npm install
-
-# Set up environment variables
-cp .env.example .env.local
-```
-
-### Environment Variables
-
-Create `.env.local` with:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-```
-
-### Database Setup
-
-Run the SQL scripts in Supabase SQL Editor:
-
-1. `supabase_setup.sql` - Core tables (profiles, likes, matches, messages)
-2. `update_schema_nickname.sql` - Add nickname field
-3. `update_schema_unread.sql` - Add unread tracking
 
 ### Run Development Server
 
@@ -122,7 +90,7 @@ This project is for educational purposes at WSB Merito University.
 
 ## 👨‍💻 Author
 
-Created by Dawid - WSB Merito Gdańsk Student
+Created by Strushs
 
 ---
 
